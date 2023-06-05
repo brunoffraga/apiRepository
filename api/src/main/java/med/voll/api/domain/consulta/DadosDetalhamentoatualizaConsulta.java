@@ -2,6 +2,6 @@ package med.voll.api.domain.consulta;
 
 import java.time.LocalDateTime;
 
-public record DadosDetalhamentoatualizaConsulta(Long id, Long idMedico, Long idPaciente, LocalDateTime data) {
+public record DadosDetalhamentoAtualizaConsulta(Long id, Long idMedico, Long idPaciente, LocalDateTime data) {
 
 }
