@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 
 import med.voll.api.domain.consulta.Consulta;
@@ -28,11 +29,14 @@ class MedicoRepositoryTest {
     @Autowired
     private MedicoRepository medicoRepository;
 
+    @Autowired
     private TestEntityManager em;
 
     @Test
     @DisplayName("Deveria devolver null quando unico medico cadastrado nao esta disponivel na data")
+    @WithMockUser
     void escolherMedicoAleatorioLivreNaDataCenario1() {
+        //given ou arrange
         var proximaSegundaAs10 = LocalDate.now()
             .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
             .atTime(10, 0);
@@ -41,8 +45,24 @@ class MedicoRepositoryTest {
         var paciente = cadastrarPaciente("Paciente", "paciente@email.com", "00000000000");
         cadastrarConsulta(medico, paciente, proximaSegundaAs10);
         
+        //when ou act
         var medicoLivre = medicoRepository.escolherMdedicoAleatorioLivreNaData(Especialidade.CARDIOLOGIA, proximaSegundaAs10);
+        
+        //the ou asset
         assertThat(medicoLivre).isNull();
+    }
+
+    @Test
+    @DisplayName("Deveria devolver medico quando ele estiver disponivel na data")
+    void escolherMedicoAleatorioLivreNaDataCenario2() {
+        var proximaSegundaAs10 = LocalDate.now()
+            .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+            .atTime(10, 0);
+
+        var medico = cadastrarMedico("Medico", "medico@voll.med", "123456", Especialidade.CARDIOLOGIA);
+        
+        var medicoLivre = medicoRepository.escolherMdedicoAleatorioLivreNaData(Especialidade.CARDIOLOGIA, proximaSegundaAs10);
+        assertThat(medicoLivre).isEqualTo(medico);
     }
 
     private void cadastrarConsulta(Medico medico, Paciente paciente, LocalDateTime data) {
