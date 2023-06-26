@@ -48,6 +48,18 @@ public class ConsultaControllerTest {
     @DisplayName("Deveria devolver codigo http 200 quando informações estão validas")
     @WithMockUser
     void agendar_cenario1() throws Exception {
+        var response = mvc
+            .perform(post("/consulta"))
+            .andReturn().getResponse();
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+    }
+
+    @Test
+    @DisplayName("Deveria devolver codigo http 200 quando informações estão validas")
+    @WithMockUser
+    void agendar_cenario2() throws Exception {
         var data = LocalDateTime.now().plusHours(1);
         var especialidade = Especialidade.CARDIOLOGIA;
 
@@ -56,7 +68,7 @@ public class ConsultaControllerTest {
 
         var response = mvc
             .perform(
-                post("/consultas")
+                post("/consulta")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(dadosAgendamentoConsultaJoson.write(
                         new DadosAgendamentoConsulta(2l, 5l, data, especialidade)
